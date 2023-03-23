@@ -101,7 +101,7 @@ def kill(sid, data):
         else:
             maf_target = '0'
     if maf_target is not None:  # send maf_target if it is not None
-        sio.emit('chat_message', maf_target, room='room')
+        sio.emit('chat_message', {"killed_player": maf_target}, room='room')
         # reset
         maf_count = 2
         maf_targets = []
