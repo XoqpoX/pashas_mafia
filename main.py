@@ -1,3 +1,4 @@
+#5 обновление посвященно Павлу
 import socketio
 import eventlet
 import random
