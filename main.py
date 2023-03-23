@@ -5,7 +5,11 @@ import random
 sio = socketio.Server()
 
 player_list = {}
-role = 6 * ['Мирный житель'] + 2 * ['Мафия'] + ['Шериф'] + ['Дон мафии']
+admin_sid = None
+role10 = 6 * ['Мирный житель'] + 2 * ['Мафия'] + ['Шериф'] + ['Дон мафии']
+role8 = 5 * ['Мирный житель'] + 1 * ['Мафия'] + ['Шериф'] + ['Дон мафии']
+maf_targets = []
+maf_target = None
 
 
 @sio.event
@@ -24,15 +28,27 @@ def disconnect(sid):
 
 @sio.event
 def message(sid, data):
+    global player_list, admin_sid
 
     print('Сообщение от клиента {}: {}'.format(sid, data))
+    # when nickname entering
     if len(data) == 1 and 'username' in data and isinstance(data['username'], str) and len(player_list) < 10:
+        if admin_sid is None:  # first entered - admin
+            admin_sid = sid
         player_list[sid] = data
+        resp = {'type': 'joined_list', 'data': player_list}
         sio.enter_room(sid, room='room')
-        sio.emit('chat_message', player_list, room='room')
+        sio.emit('chat_message', resp, room='room')
+    # if player count already 10
     if len(data) == 1 and 'username' in data and isinstance(data['username'], str) and len(player_list) == 10:
         sio.emit('chat_message', 'player_list_is_full', room='room')
+
+@sio.event
+def start(sid, data):
+    global player_list
+
     if data == 'start':
+        # shuffle order of players
         keys = list(player_list.keys())
         random.shuffle(keys)
         shuffled_player_list = {}
@@ -40,16 +56,43 @@ def message(sid, data):
             player = player_list[key]
             player['number'] = num
             shuffled_player_list[key] = player
+        # choose 8 players or 10
+        if len(shuffled_player_list) == 8:
+            role = role8
+        elif len(shuffled_player_list) == 10:
+            role = role10
         random.shuffle(role)
+        # giving roles to players
         for sid, data in shuffled_player_list.items():
             data['role'] = role.pop()
             data.update({'status': 'alive'})
-        sio.emit('chat_message', shuffled_player_list, room='room')
+            data.update({'admin': 'false'})
+        shuffled_player_list[admin_sid]['admin'] = 'true'
+        player_list = shuffled_player_list
+        resp = {'type': 'users_data', 'data': shuffled_player_list}
+        # sending data to client
+        sio.emit('chat_message', resp, room='room')
 
+@sio.event
+def kill(sid, data):
+    global player_list, maf_targets, maf_target
 
+    if len(player_list) == 8:
+        maf_count = 2
+    elif len(player_list) == 10:
+        maf_count = 3
 
-
-
+    if len(maf_targets) < maf_count and type(data) == int:  # waiting for all shots and check for them data type
+        maf_targets += data
+    if len(maf_targets) == maf_count and maf_targets[0] != 0:  # when shot count is equal to mafia count,and it is not 0
+        if all(x == maf_targets[0] for x in maf_targets):  # if shots are same
+            maf_target = maf_targets[0]
+        else:
+            maf_target = 0
+    if type(data) != int:  # print error if data type is not int
+        print('incorrect kill data type')
+    if maf_target is not None:  # send maf_target if it is not None
+        sio.emit('chat_message', maf_target, room='room')
 
 
 # Запускаем сервер Socket.IO
