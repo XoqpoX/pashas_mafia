@@ -82,6 +82,11 @@ def start(sid, data):
         # sending data to client
         sio.emit('chat_message', resp, room='room')
 
+    if data == 'night':
+        resp = {'type': 'night_start'}
+        # sending data to client
+        sio.emit('chat_message', resp, room='room')
+
 @sio.event
 def kill(sid, data):
     print('Сообщение kill от клиента {}: {}'.format(sid, data))
