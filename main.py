@@ -44,6 +44,7 @@ def message(sid, data):
 
         resp = {'type': 'joined_list', 'data': player_list}
         sio.enter_room(sid, room='room')
+        sio.emit('chat_message', {'sid': sid, 'admin': player_list[sid]['admin']}, room=sid)
         sio.emit('chat_message', resp, room='room')
     # if player count already 10
     if len(data) == 1 and 'username' in data and isinstance(data['username'], str) and len(player_list) == 10:
