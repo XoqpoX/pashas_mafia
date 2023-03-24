@@ -17,7 +17,7 @@ maf_target = None
 @sio.event
 def connect(sid, environ):
     print('Подключен клиент:', sid)
-    resp = {'type': 'users_data', 'data': player_list}
+    resp = {'type': 'player_list', 'data': player_list}
     sio.emit('chat_message', resp, room=sid)
 
 
