@@ -3,7 +3,7 @@ import socketio
 import eventlet
 import random
 
-sio = socketio.Server()
+sio = socketio.Server(cors_allowed_origins='*')
 
 player_list = {}
 admin_sid = None
