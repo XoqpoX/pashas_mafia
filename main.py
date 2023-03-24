@@ -36,9 +36,12 @@ def message(sid, data):
     print('Сообщение message от клиента {}: {}'.format(sid, data))
     # when nickname entering
     if len(data) == 1 and 'username' in data and isinstance(data['username'], str) and len(player_list) < 10:
+        player_list[sid] = data
+        player_list[sid]['admin'] = 'false'
         if admin_sid is None:  # first entered - admin
             admin_sid = sid
-        player_list[sid] = data
+            player_list[sid]['admin'] = 'true'
+
         resp = {'type': 'joined_list', 'data': player_list}
         sio.enter_room(sid, room='room')
         sio.emit('chat_message', resp, room='room')
