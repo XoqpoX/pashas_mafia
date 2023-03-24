@@ -39,7 +39,7 @@ def message(sid, data):
         if admin_sid is None:  # first entered - admin
             admin_sid = sid
         player_list[sid] = data
-        resp = {'type': 'joined_list', 'data': player_list, 'sid': sid}
+        resp = {'type': 'joined_list', 'data': player_list}
         sio.enter_room(sid, room='room')
         sio.emit('chat_message', resp, room='room')
     # if player count already 10
