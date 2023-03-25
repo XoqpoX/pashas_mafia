@@ -1,4 +1,3 @@
-#5 обновление посвященно Павлу
 import socketio
 import eventlet
 import random
@@ -91,9 +90,15 @@ def start(sid, data):
         resp = {'type': 'restart'}
         # sending data to client
         sio.emit('chat_message', resp, room='room')
+        # TODO::Сделать перезапуск на сервере
 
     if data == 'don':
         resp = {'type': 'don'}
+        # sending data to client
+        sio.emit('chat_message', resp, room='room')
+
+    if data == 'morning':
+        resp = {'type': 'morning'}
         # sending data to client
         sio.emit('chat_message', resp, room='room')
 
