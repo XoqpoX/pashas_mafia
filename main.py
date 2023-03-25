@@ -13,6 +13,14 @@ maf_targets = []
 maf_target = None
 
 
+def reset():
+    global player_list, admin_sid, role, maf_targets, maf_target
+    player_list = {}
+    admin_sid = None
+    role = role8
+    maf_targets = []
+    maf_target = None
+
 @sio.event
 def connect(sid, environ):
     print('Подключен клиент:', sid)
@@ -90,7 +98,7 @@ def start(sid, data):
         resp = {'type': 'restart'}
         # sending data to client
         sio.emit('chat_message', resp, room='room')
-        # TODO::Сделать перезапуск на сервере
+        reset()
 
     if data == 'don':
         resp = {'type': 'don'}
@@ -119,7 +127,7 @@ def kill(sid, data):
         maf_targets.append(data)
         print('maf_targets posle = ', maf_targets)
     if len(maf_targets) == maf_count:  # when shot count is equal to mafia count
-        if all(x == maf_targets[0] for x in maf_targets):  # if shots are same
+        if all(int(x) == int(maf_targets[0]) for x in maf_targets):  # if shots are same
             if maf_targets[0] != 0:
                 maf_target = maf_targets[0]
             else:
