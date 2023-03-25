@@ -92,6 +92,11 @@ def start(sid, data):
         # sending data to client
         sio.emit('chat_message', resp, room='room')
 
+    if data == 'don':
+        resp = {'type': 'don'}
+        # sending data to client
+        sio.emit('chat_message', resp, room='room')
+
 @sio.event
 def kill(sid, data):
     print('Сообщение kill от клиента {}: {}'.format(sid, data))
