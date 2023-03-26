@@ -23,7 +23,7 @@ def reset():
     maf_targets = []
     maf_target = None
 
-    os.execv(sys.argv[0], sys.argv)
+    os.execv(sys.executable, ['python'] + [sys.argv[0]])
 
 @sio.event
 def connect(sid, environ):
