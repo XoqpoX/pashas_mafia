@@ -1,5 +1,7 @@
 import socketio
 import eventlet
+import os
+import sys
 import random
 
 sio = socketio.Server(cors_allowed_origins='*')
@@ -20,6 +22,8 @@ def reset():
     role = role8
     maf_targets = []
     maf_target = None
+
+    os.execv(sys.argv[0], sys.argv)
 
 @sio.event
 def connect(sid, environ):
